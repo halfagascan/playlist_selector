@@ -20,7 +20,6 @@ from pathlib import Path
 # Constants & configuration
 # ----------------------------------------------------------------------
 
-
 HOME = Path("/home/jerry")
 EDITOR_PATH = HOME / "m3u-epg-editor" / "m3u-epg-editor-py3.py"
 CONFIG_PATH = Path("m3u-editor-config.json")
@@ -37,11 +36,15 @@ COL_WIDTH = 50
 # ----------------------------------------------------------------------
 BLOCKED_KEYWORDS = [
     "sports", "adult", "nfl", "nba", "nhl", "mlb", "football", "baseball",
-    "soccer", "espn", "fox sports", "bein", "sky sports", "ncaa", "wwe", "ufc",
-    "boxing", "tennis", "golf", "cricket", "rugby", "f1", "motogp", "nascar"
+    "soccer", "espn", "fox sports", "bein", "sky sports",
+    "ncaa", "wwe", "ufc", "boxing", "tennis", "golf",
+    "cricket", "rugby", "f1", "motogp", "nascar",
+
 ]
-BLOCKED_PATTERN = re.compile("|".join(map(re.escape, BLOCKED_KEYWORDS)),
-                             re.IGNORECASE)
+BLOCKED_PATTERN = re.compile(
+    "|".join(map(re.escape, BLOCKED_KEYWORDS)),
+    re.IGNORECASE
+)
 
 
 def is_blocked(name: str) -> bool:
@@ -159,7 +162,7 @@ def toggle_item(enabled: bool) -> str:
 
 def truncate(text: str, width: int) -> str:
     """Shorten text to `width` characters, adding ellipsis if needed."""
-    return text[:width - 3] + "..." if len(text) > width else text
+    return text[: width - 3] + "..." if len(text) > width else text
 
 
 def print_groups_3x50(items, start, enabled_dict):
@@ -170,9 +173,9 @@ def print_groups_3x50(items, start, enabled_dict):
     print("-" * 156)
 
     col_size = 50
-    col1 = items[start:start + col_size]
-    col2 = items[start + col_size:start + col_size * 2]
-    col3 = items[start + col_size * 2:end]
+    col1 = items[start: start + col_size]
+    col2 = items[start + col_size: start + col_size * 2]
+    col3 = items[start + col_size * 2: end]
 
     for i in range(col_size):
         line = ""
@@ -199,7 +202,8 @@ def paginated_groups_selector(all_items, enabled_dict, all_groups):
     while True:
         # Apply search filter
         display = [
-            g for g in sorted_items
+            g
+            for g in sorted_items
             if not search_query or search_query.lower() in g.lower()
         ]
 
@@ -212,9 +216,8 @@ def paginated_groups_selector(all_items, enabled_dict, all_groups):
 
         total_pages = (len(display) - 1) // GROUP_PAGE_SIZE + 1
         current_page = start // GROUP_PAGE_SIZE + 1
-        print(
-            "Commands: n=next, p=prev, a=all on page, A=ALL, N=DISABLE ALL, q=save"
-        )
+        print("Commands: n=next, p=prev, a=all on page, A=ALL, "
+              "N=DISABLE ALL, q=save")
         choice = input(f"Page {current_page}/{total_pages} > ").strip()
 
         if choice == "q":
@@ -224,7 +227,7 @@ def paginated_groups_selector(all_items, enabled_dict, all_groups):
         elif choice == "p" and start >= GROUP_PAGE_SIZE:
             start -= GROUP_PAGE_SIZE
         elif choice == "a":
-            for g in display[start:start + GROUP_PAGE_SIZE]:
+            for g in display[start: start + GROUP_PAGE_SIZE]:
                 enabled_dict[g] = True
             print("All on page selected.")
         elif choice == "A":
@@ -291,7 +294,8 @@ def paginated_channels_selector(all_items, enabled_dict, all_channels):
 
     while True:
         display = [
-            c for c in sorted_items
+            c
+            for c in sorted_items
             if not search_query or search_query.lower() in c.lower()
         ]
 
@@ -304,15 +308,17 @@ def paginated_channels_selector(all_items, enabled_dict, all_channels):
 
         total_pages = (len(display) - 1) // CHANNEL_PAGE_SIZE + 1
         current_page = start // CHANNEL_PAGE_SIZE + 1
-        print("Commands: n=next+deselect, p=prev, a=all on page, "
-              "A=ALL, N=DISABLE ALL, q=save")
+        print(
+            "Commands: n=next+deselect, p=prev, a=all on page, "
+            "A=ALL, N=DISABLE ALL, q=save"
+        )
         choice = input(f"Page {current_page}/{total_pages} > ").strip()
 
         if choice == "q":
             break
         elif choice == "n":
             # Deselect everything on the current page
-            for ch in display[start:start + CHANNEL_PAGE_SIZE]:
+            for ch in display[start: start + CHANNEL_PAGE_SIZE]:
                 enabled_dict[ch] = False
             print("All on page deselected.")
             if start + CHANNEL_PAGE_SIZE < len(display):
@@ -320,7 +326,7 @@ def paginated_channels_selector(all_items, enabled_dict, all_channels):
         elif choice == "p" and start >= CHANNEL_PAGE_SIZE:
             start -= CHANNEL_PAGE_SIZE
         elif choice == "a":
-            for ch in display[start:start + CHANNEL_PAGE_SIZE]:
+            for ch in display[start: start + CHANNEL_PAGE_SIZE]:
                 enabled_dict[ch] = True
             print("All on page selected.")
         elif choice == "A":
@@ -375,9 +381,11 @@ def main():
             return
     elif source_type == "file":
         while not m3u_path:
-            m3u_input = input_with_retry(f"Local M3U file path [{HOME}]: ",
-                                         default=str(HOME),
-                                         validator=validate_file_path)
+            m3u_input = input_with_retry(
+                f"Local M3U file path [{HOME}]: ",
+                default=str(HOME),
+                validator=validate_file_path,
+            )
             m3u_path = Path(m3u_input).expanduser().resolve()
             if not m3u_path.is_file():
                 print(f"File not found: {m3u_path}")
@@ -399,8 +407,16 @@ def main():
             print("\nFound saved session:")
             print(f"  Config: {saved_config_path.name}")
             print(
-                f"  Groups: {saved_groups_path.name if saved_groups_path.is_file() else 'none'}"
+                f"  Groups: {saved_groups_path.name}"
+                if saved_groups_path.is_file()
+                else " Groups: none "
             )
+            groups_message = (
+                f"  Groups: {saved_groups_path.name}"
+                if saved_groups_path.is_file()
+                else "  Groups: none"
+                )
+            print(groups_message)
             reload = input("Reload saved session? (y/n) [y]: ").strip().lower()
             if reload in ("", "y", "yes"):
                 try:
@@ -411,11 +427,10 @@ def main():
                     # Run the editor immediately with the restored config
                     print("\nRunning m3u‑epg‑editor …")
                     result = subprocess.run(
-                        ["python3",
-                         str(EDITOR_PATH), "-j",
-                         str(CONFIG_PATH)],
+                        ["python3", str(EDITOR_PATH), "-j", str(CONFIG_PATH)],
                         capture_output=True,
-                        text=True)
+                        text=True,
+                    )
                     if result.returncode != 0:
                         print("Editor failed:")
                         print(result.stderr)
@@ -424,9 +439,13 @@ def main():
                     # Copy generated files to the trimmed folder
                     print(f"\nCopying results to: {TRIMMED_DIR}")
                     expected = [
-                        "original.m3u", "original.channels.txt",
-                        "original.xml", "no_epg_channels.txt", "selected.m3u8",
-                        "selected.xml", "process.log"
+                        "original.m3u",
+                        "original.channels.txt",
+                        "original.xml",
+                        "no_epg_channels.txt",
+                        "selected.m3u8",
+                        "selected.xml",
+                        "process.log",
                     ]
                     for fname in expected:
                         src = TEMP_DIR / fname
@@ -436,8 +455,8 @@ def main():
                             print(f"  Copied: {dst.name}")
 
                     # Save the config alongside the output
-                    shutil.copy2(CONFIG_PATH,
-                                 TRIMMED_DIR / "m3u-editor-config.json")
+                    shutil.copy2(CONFIG_PATH, TRIMMED_DIR /
+                                 "m3u-editor-config.json")
                     print("  Copied: m3u-editor-config.json")
 
                     print("\nDone! All output →", TRIMMED_DIR)
@@ -455,6 +474,7 @@ def main():
     print("M3U file loaded.")
     print(f"Groups: {groups_dict}")
     print(f"Channels: {channels_dict}")
+    print("End of script")  # ---------------debug end
     all_groups = list(groups_dict.keys())
 
     # Initialise group enable‑state (all disabled)
@@ -470,23 +490,29 @@ def main():
             pass
 
     print("\nSelect GROUPS to KEEP (150 per page: 3×50)")
-    enabled_groups = paginated_groups_selector(all_groups, group_enabled,
-                                               all_groups)
+    enabled_groups = paginated_groups_selector(
+        all_groups,
+        group_enabled,
+        all_groups
+        )
+
     if saved_groups_path:
-        saved_groups_path.write_text(json.dumps(list(enabled_groups.keys())),
-                                     encoding="utf-8")
+        saved_groups_path.write_text(
+            json.dumps(list(enabled_groups.keys())), encoding="utf-8"
+        )
 
     # --------------------------------------------------------------
     # 4️⃣ Filter channels based on selected groups
     # --------------------------------------------------------------
     filtered_channels = [
-        name for name, data in channels_dict.items()
-        if data["group"] in enabled_groups
+     name for name, data in channels_dict.items()
+     if data["group"] in enabled_groups
     ]
-    # Build a dict of channel → enabled flag (only for the filtered channels)
+
     channel_enabled = {
-        name: data["enabled"]
-        for name, data in channels_dict.items() if name in filtered_channels
+     name: data["enabled"]
+     for name, data in channels_dict.items()
+     if name in filtered_channels
     }
 
     # --------------------------------------------------------------
@@ -494,3 +520,17 @@ def main():
     # --------------------------------------------------------------
     print(f"\nFiltered to {len(filtered_channels)} channels.")
 
+    enabled_channels = paginated_channels_selector(
+     filtered_channels,      # list of channel names to show
+     channel_enabled,       # dict of pre‑selected states
+     filtered_channels      # full set for “select all / disable all”
+    )
+
+    # -----------------------------------------------------------------
+    # Save the user‑selected channels (optional – you can adapt this)
+    # -----------------------------------------------------------------
+    output_file = TRIMMED_DIR / "selected_channels.txt"
+    output_file.write_text(
+        "\n".join(sorted(enabled_channels)),
+        encoding="utf-8")
+    print(f"Selected channels saved to: {output_file}")
