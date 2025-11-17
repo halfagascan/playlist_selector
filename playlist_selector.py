@@ -19,7 +19,7 @@ from pathlib import Path
 # ----------------------------------------------------------------------
 # Constants & configuration
 # ----------------------------------------------------------------------
-print("Script started") #####--------------debug start
+
 
 HOME = Path("/home/jerry")
 EDITOR_PATH = HOME / "m3u-epg-editor" / "m3u-epg-editor-py3.py"
@@ -455,7 +455,6 @@ def main():
     print("M3U file loaded.")
     print(f"Groups: {groups_dict}")
     print(f"Channels: {channels_dict}")
-    print("End of script") #---------------debug end
     all_groups = list(groups_dict.keys())
 
     # Initialise group enable‑state (all disabled)
