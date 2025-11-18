@@ -1,0 +1,6 @@
+# This tool uses only Python standard library
+# No external dependencies required
+# Tested on Python 3.8 – 3.12
+
+# Generates config for:
+# https://github.com/bebo-dot-dev/m3u-epg-editor
